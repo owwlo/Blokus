@@ -1,0 +1,3 @@
+[submodule "lib/cheat-game"]
+	path = lib/cheat-game
+	url = https://github.com/yoav-zibin/cheat-game.git
