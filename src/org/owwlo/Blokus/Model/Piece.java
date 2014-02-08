@@ -16,13 +16,22 @@ public class Piece {
 	private boolean pointBitmap[][] = null;
 	private int xMax = 0, yMax = 0;
 
-	public final boolean[][] getBitmap() throws NoInitialContextException {
-		if(pointBitmap == null) {
-			throw new NoInitialContextException();
-		}
+	public final List<Point> getPointList() {
+		return pointList;
+	}
+	
+	public final boolean[][] getBitmap() {
 		return pointBitmap;
 	}
-
+	
+	public final int getWidth() {
+		return xMax;
+	}
+	
+	public final int getHeight() {
+		return yMax;
+	}
+	
 	/**
 	 * A Piece item contain no point used in Blokus.
 	 */

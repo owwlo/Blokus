@@ -4,7 +4,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
+import org.owwlo.Blokus.Constants;
+import org.owwlo.Blokus.Utils;
 
 /**
  * A Board item used in Blokus.
@@ -32,7 +35,6 @@ public class GameBoard {
 	 * a new bitmap for the board.
 	 */
 	public void resetBoardSize(int x, int y) {
-		throw new NotImplementedException();
 	}
 
 	/**
@@ -50,7 +52,50 @@ public class GameBoard {
 	 * @return If it is fit.
 	 */
 	public boolean canFit(Piece piece, Point point) {
+		boolean pieceBitmap[][] = piece.getBitmap();
+		int pieceWidth = piece.getWidth();
+		int pieceHeight = piece.getHeight();
+		List<Point> piecePointList = piece.getPointList();
+		boolean isCornerOccupy = false;
+		if(point.x < 0 || point.y < 0) return false;
+		for(Point p : piecePointList) {
+			if(point.x + p.x >= xLen) return false;
+			if(point.y + p.y >= yLen) return false;
+			if(boardBitmp[point.y + p.y][point.x + p.y] != Constants.NO_OCCUPY_POINT_VALUE)
+				return false;
+			if(check4DirectionOccupy(point.x + p.x, point.y + p.y)) return false;
+			if(check4CornerOccupy(point.x + p.x, point.y + p.y))
+				isCornerOccupy = true;
+		}
+		return true;
+	}
+
+	private boolean check4CornerOccupy(int x, int y) {
 		return false;
+	}
+
+	private boolean check4DirectionOccupy(int x, int y) {
+		if(Utils.Range(x+1, 0, xLen)) {
+			if(boardBitmp[y][x+1] != Constants.NO_OCCUPY_POINT_VALUE)
+				return true;
+		}
+		if(Utils.Range(x-1, 0, xLen)) {
+			if(boardBitmp[y][x-1] != Constants.NO_OCCUPY_POINT_VALUE)
+				return true;
+		}
+		if(Utils.Range(y+1, 0, yLen)) {
+			if(boardBitmp[y+1][x] != Constants.NO_OCCUPY_POINT_VALUE)
+				return true;
+		}
+		if(Utils.Range(y-1, 0, yLen)) {
+			if(boardBitmp[y-1][x] != Constants.NO_OCCUPY_POINT_VALUE)
+				return true;
+		}
+		return false;
+	}
+
+	public boolean canFit(MovablePiece mp) {
+		return canFit(mp, mp.getPosition());
 	}
 
 	public static class MovablePiece extends Piece {
@@ -69,7 +114,7 @@ public class GameBoard {
 			position = p;
 		}
 
-		public Point getPosition() {
+		public final Point getPosition() {
 			return position;
 		}
 	}
