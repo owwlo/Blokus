@@ -4,8 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
 import org.owwlo.Blokus.Constants;
 import org.owwlo.Blokus.Utils;
 
@@ -44,17 +42,20 @@ public class GameBoard {
 		xLen = x;
 		yLen = y;
 		boardBitmp = new int[y][x];
+		for(int i=0;i<y;i++) {
+			for(int j=0;j<x;j++) {
+				boardBitmp[i][j] = Constants.NO_OCCUPY_POINT_VALUE;
+			}
+		}
 	}
 
 	/**
 	 * Judge whether the Piece can fit into the board.
 	 * @param p The piece to be test.
+	 * @param isInitial Default false.
 	 * @return If it is fit.
 	 */
-	public boolean canFit(Piece piece, Point point) {
-		boolean pieceBitmap[][] = piece.getBitmap();
-		int pieceWidth = piece.getWidth();
-		int pieceHeight = piece.getHeight();
+	public boolean canFit(Piece piece, Point point, int owner, boolean isInitial) {
 		List<Point> piecePointList = piece.getPointList();
 		boolean isCornerOccupy = false;
 		if(point.x < 0 || point.y < 0) return false;
@@ -63,50 +64,106 @@ public class GameBoard {
 			if(point.y + p.y >= yLen) return false;
 			if(boardBitmp[point.y + p.y][point.x + p.y] != Constants.NO_OCCUPY_POINT_VALUE)
 				return false;
-			if(check4DirectionOccupy(point.x + p.x, point.y + p.y)) return false;
-			if(check4CornerOccupy(point.x + p.x, point.y + p.y))
-				isCornerOccupy = true;
+			if(check4DirectionOccupy(point.x + p.x, point.y + p.y, owner)) return false;
+			if(!isInitial) {
+				if(check4CornerOccupy(point.x + p.x, point.y + p.y, owner))
+					isCornerOccupy = true;
+			}
+		}
+		if(!isInitial) {
+			if(!isCornerOccupy) return false;
 		}
 		return true;
 	}
 
-	private boolean check4CornerOccupy(int x, int y) {
+	private boolean check4CornerOccupy(int x, int y, int color) {
+		if(Utils.Range(x+1, 0, xLen)) {
+			if(Utils.Range(y+1, 0, yLen)) {
+				if(boardBitmp[y+1][x+1] == color)
+					return true;
+			}
+			if(Utils.Range(y-1, 0, yLen)) {
+				if(boardBitmp[y-1][x+1] == color)
+					return true;
+			}
+		}
+		if(Utils.Range(x-1, 0, xLen)) {
+			if(Utils.Range(y+1, 0, yLen)) {
+				if(boardBitmp[y+1][x-1] == color)
+					return true;
+			}
+			if(Utils.Range(y-1, 0, yLen)) {
+				if(boardBitmp[y-1][x-1] == color)
+					return true;
+			}
+		}
 		return false;
 	}
 
-	private boolean check4DirectionOccupy(int x, int y) {
+	private boolean check4DirectionOccupy(int x, int y, int color) {
 		if(Utils.Range(x+1, 0, xLen)) {
-			if(boardBitmp[y][x+1] != Constants.NO_OCCUPY_POINT_VALUE)
+			if(boardBitmp[y][x+1] == color)
 				return true;
 		}
 		if(Utils.Range(x-1, 0, xLen)) {
-			if(boardBitmp[y][x-1] != Constants.NO_OCCUPY_POINT_VALUE)
+			if(boardBitmp[y][x-1] == color)
 				return true;
 		}
 		if(Utils.Range(y+1, 0, yLen)) {
-			if(boardBitmp[y+1][x] != Constants.NO_OCCUPY_POINT_VALUE)
+			if(boardBitmp[y+1][x] == color)
 				return true;
 		}
 		if(Utils.Range(y-1, 0, yLen)) {
-			if(boardBitmp[y-1][x] != Constants.NO_OCCUPY_POINT_VALUE)
+			if(boardBitmp[y-1][x] == color)
 				return true;
 		}
 		return false;
 	}
 
 	public boolean canFit(MovablePiece mp) {
-		return canFit(mp, mp.getPosition());
+		return canFit(mp, mp.getPosition(), mp.getOwnerId(), false);
+	}
+
+	public boolean canFit(MovablePiece mp, boolean isInitial) {
+		return canFit(mp, mp.getPosition(), mp.getOwnerId(), isInitial);
+	}
+
+	public boolean addPiece(MovablePiece mp) {
+		return addPiece(mp, false);
+	}
+
+	public boolean addPiece(MovablePiece mp, boolean isInitial) {
+		if(canFit(mp, isInitial)) {
+			pieceList.add(mp);
+			List<Point> pointList = mp.getPointList();
+			Point piecePosition = mp.getPosition();
+			for(Point p : pointList) {
+				boardBitmp[piecePosition.y + p.y][piecePosition.x + p.x] = mp.getOwnerId();
+			}
+			if(Constants.DEBUG) {
+				printBoard();
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public static class MovablePiece extends Piece {
 		private Point position;
+		private int ownerId;
 
-		public MovablePiece(){
+		/**
+		 * "ownid" is a must because we need to know this piece belongs to whom.
+		 * @param ownid
+		 */
+		public MovablePiece(int ownid){
+			ownerId = ownid;
 			position = new Point();
 		}
 
-		public MovablePiece(String data, Point point){
+		public MovablePiece(int ownid, String data, Point point){
 			super(data);
+			ownerId = ownid;
 			position = point;
 		}
 
@@ -117,5 +174,48 @@ public class GameBoard {
 		public final Point getPosition() {
 			return position;
 		}
+
+		public final int getOwnerId() {
+			return ownerId;
+		}
+
+		@Override
+		public void printPiece() {
+			System.out.println("PieceBitMapForOwner: " + ownerId);
+			super.printPiece();
+		}
+	}
+
+	public void printBoard() {
+		System.out.println("********BoardBitMap*********");
+		for(int i=0;i<yLen;i++) {
+			for(int j=0;j<xLen;j++) {
+				System.out.print(boardBitmp[i][j] + " ");
+			}
+			System.out.println();
+		}
+		System.out.println("****************************");
+		System.out.println();
+	}
+
+	public static void main(String[] args) {
+		GameBoard gb = new GameBoard(5, 5);
+		MovablePiece mp1 = new MovablePiece(0);
+		mp1.addPoint(new Point(0,0));
+		mp1.addPoint(new Point(1,0));
+		mp1.addPoint(new Point(2,0));
+		mp1.addPoint(new Point(2,1));
+		mp1.setPosition(new Point(0, 0));
+
+		gb.addPiece(mp1, true);
+
+		MovablePiece mp2 = new MovablePiece(0);
+		mp2.addPoint(new Point(0,0));
+		mp2.addPoint(new Point(1,0));
+		mp2.addPoint(new Point(0,1));
+		mp2.addPoint(new Point(1,1));
+		mp2.setPosition(new Point(3, 1));
+
+		System.out.println(gb.canFit(mp2));
 	}
 }

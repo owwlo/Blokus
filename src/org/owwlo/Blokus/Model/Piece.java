@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NoInitialContextException;
+import org.owwlo.Blokus.Constants;
 
 /**
  * A Piece item used in Blokus.
@@ -19,19 +19,19 @@ public class Piece {
 	public final List<Point> getPointList() {
 		return pointList;
 	}
-	
+
 	public final boolean[][] getBitmap() {
 		return pointBitmap;
 	}
-	
+
 	public final int getWidth() {
 		return xMax;
 	}
-	
+
 	public final int getHeight() {
 		return yMax;
 	}
-	
+
 	/**
 	 * A Piece item contain no point used in Blokus.
 	 */
@@ -60,21 +60,36 @@ public class Piece {
 	 */
 	public void addPoint(Point p) {
 		pointList.add(p);
-		if(p.x > xMax || p.y > yMax) {
+		if(p.x >= xMax || p.y >= yMax) {
 			generateBitmapFromPointList();
 		} else {
 			pointBitmap[p.y][p.x] = true;
+		}
+		if(Constants.DEBUG) {
+			printPiece();
 		}
 	}
 
 	private void generateBitmapFromPointList(){
 		for(Point p : pointList) {
-			if(p.x > xMax) xMax = p.x;
-			if(p.y > yMax) yMax = p.y;
+			if(p.x >= xMax) xMax = p.x + 1;
+			if(p.y >= yMax) yMax = p.y + 1;
 		}
 		pointBitmap = new boolean[yMax][xMax];
 		for(Point p : pointList) {
 			pointBitmap[p.y][p.x] = true;
 		}
+	}
+
+	public void printPiece() {
+		System.out.println("****************************");
+		for(int i=0;i<yMax;i++) {
+			for(int j=0;j<xMax;j++) {
+				System.out.print((pointBitmap[i][j]?1:0) + " ");
+			}
+			System.out.println();
+		}
+		System.out.println("****************************");
+		System.out.println();
 	}
 }
