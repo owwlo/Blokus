@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.owwlo.Blokus.Constants;
+import org.owwlo.Blokus.Constants.BlokusPiece;
 import org.owwlo.Blokus.Utils;
 
 /**
@@ -16,6 +17,13 @@ import org.owwlo.Blokus.Utils;
 public class GameBoard {
 	private List<MovablePiece> pieceList = new ArrayList<MovablePiece>();
 	private List<BoardListener> boardLinsterList = new LinkedList<BoardListener>();
+	private List<Piece> pieceBowl = new ArrayList<Piece>(){{
+		for(String str : BlokusPiece.pieceStringList) {
+			this.add(new Piece(str));
+		}
+		System.out.println("Count of Pieces loaded: " + this.size());
+	}};
+
 	private int xLen = 0, yLen = 0;
 
 	/*
@@ -77,6 +85,10 @@ public class GameBoard {
 			if(!isCornerOccupy) return false;
 		}
 		return true;
+	}
+
+	public final int[][] getBitmap() {
+		return boardBitmp;
 	}
 
 	private boolean check4CornerOccupy(int x, int y, int color) {
@@ -224,6 +236,10 @@ public class GameBoard {
 		}
 	}
 
+	public final List<Piece> getAllPiece() {
+		return pieceBowl;
+	}
+
 	public static void main(String[] args) {
 		GameBoard gb = new GameBoard(5, 5);
 		MovablePiece mp1 = new MovablePiece(0);
@@ -240,7 +256,7 @@ public class GameBoard {
 		mp2.addPoint(new Point(1,0));
 		mp2.addPoint(new Point(0,1));
 		mp2.addPoint(new Point(1,1));
-		mp2.setPosition(new Point(3, 1));
+		mp2.setPosition(new Point(3, 2));
 
 		System.out.println(gb.canFit(mp2));
 	}

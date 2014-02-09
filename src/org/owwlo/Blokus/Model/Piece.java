@@ -51,7 +51,12 @@ public class Piece {
 	 * @param s The string contain data for Piece.
 	 */
 	public void setPointFromString(String s) {
-
+		String strs[] = s.split(";");
+		for(String str : strs) {
+			String pos[] = str.split(",");
+			Point point = new Point(Integer.parseInt(pos[1]), Integer.parseInt(pos[0]));
+			addPoint(point);
+		}
 	}
 
 	/**
