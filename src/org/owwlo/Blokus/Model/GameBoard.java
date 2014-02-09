@@ -2,6 +2,7 @@ package org.owwlo.Blokus.Model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.owwlo.Blokus.Constants;
@@ -14,6 +15,7 @@ import org.owwlo.Blokus.Utils;
 
 public class GameBoard {
 	private List<MovablePiece> pieceList = new ArrayList<MovablePiece>();
+	private List<BoardListener> boardLinsterList = new LinkedList<BoardListener>();
 	private int xLen = 0, yLen = 0;
 
 	/*
@@ -47,6 +49,7 @@ public class GameBoard {
 				boardBitmp[i][j] = Constants.NO_OCCUPY_POINT_VALUE;
 			}
 		}
+		notifyOnBitmapChanged(boardBitmp);
 	}
 
 	/**
@@ -140,6 +143,7 @@ public class GameBoard {
 			for(Point p : pointList) {
 				boardBitmp[piecePosition.y + p.y][piecePosition.x + p.x] = mp.getOwnerId();
 			}
+			notifyOnBitmapChanged(boardBitmp);
 			if(Constants.DEBUG) {
 				printBoard();
 			}
@@ -196,6 +200,28 @@ public class GameBoard {
 		}
 		System.out.println("****************************");
 		System.out.println();
+	}
+
+	/**
+	 * Listener for observing if anyone has made a move.
+	 * @author owwlo
+	 */
+	public static interface BoardListener {
+		public void OnBoardBitmapChanged(final int bmp[][]);
+	}
+
+	public void addBoardListener(BoardListener listener) {
+		boardLinsterList.add(listener);
+	}
+
+	public void removeBoardListener(BoardListener listener) {
+		boardLinsterList.remove(listener);
+	}
+
+	public void notifyOnBitmapChanged(final int bmp[][]) {
+		for(BoardListener listener : boardLinsterList) {
+			listener.OnBoardBitmapChanged(bmp);
+		}
 	}
 
 	public static void main(String[] args) {
