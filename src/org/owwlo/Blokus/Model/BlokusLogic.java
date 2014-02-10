@@ -14,7 +14,7 @@ import org.owwlo.Blokus.Utils;
  * @author owwlo
  */
 
-public class GameBoard {
+public class BlokusLogic {
 	private List<MovablePiece> pieceList = new ArrayList<MovablePiece>();
 	private List<BoardListener> boardLinsterList = new LinkedList<BoardListener>();
 	private List<Piece> pieceBowl = new ArrayList<Piece>(){{
@@ -35,7 +35,7 @@ public class GameBoard {
 	/**
 	 * Create a 0x0 GameBoard.
 	 */
-	public GameBoard() {
+	public BlokusLogic() {
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class GameBoard {
 	/**
 	 * Create a x*y GameBoard.
 	 */
-	public GameBoard(int x, int y) {
+	public BlokusLogic(int x, int y) {
 		xLen = x;
 		yLen = y;
 		boardBitmp = new int[y][x];
@@ -241,7 +241,7 @@ public class GameBoard {
 	}
 
 	public static void main(String[] args) {
-		GameBoard gb = new GameBoard(5, 5);
+		BlokusLogic gb = new BlokusLogic(5, 5);
 		MovablePiece mp1 = new MovablePiece(0);
 		mp1.addPoint(new Point(0,0));
 		mp1.addPoint(new Point(1,0));

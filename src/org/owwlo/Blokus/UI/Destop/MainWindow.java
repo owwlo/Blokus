@@ -15,9 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.owwlo.Blokus.Constants;
-import org.owwlo.Blokus.Model.GameBoard;
-import org.owwlo.Blokus.Model.GameBoard.BoardListener;
-import org.owwlo.Blokus.Model.GameBoard.MovablePiece;
+import org.owwlo.Blokus.Model.BlokusLogic;
+import org.owwlo.Blokus.Model.BlokusLogic.BoardListener;
+import org.owwlo.Blokus.Model.BlokusLogic.MovablePiece;
 
 public class MainWindow extends JFrame implements ActionListener,
 		MouseMotionListener {
@@ -28,14 +28,14 @@ public class MainWindow extends JFrame implements ActionListener,
 	private List<JButton> btnList;
 	private BoardListener boardListener;
 
-	private GameBoard gameboard;
+	private BlokusLogic gameboard;
 
 	public MainWindow() {
 		this.setSize(600, 600);
 		this.setResizable(false);
 
 		btnList = new ArrayList<JButton>();
-		gameboard = new GameBoard(14, 14);
+		gameboard = new BlokusLogic(14, 14);
 
 		layout = new GridLayout(BLOCK_LENGTH, BLOCK_LENGTH);
 		this.setLayout(layout);
