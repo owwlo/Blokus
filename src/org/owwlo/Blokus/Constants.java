@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constants {
-	public final static boolean DEBUG = true;
+	public final static boolean DEBUG = false;
 
 	public final static int NO_OCCUPY_POINT_VALUE	= 9/*Integer.MIN_VALUE*/;
 
