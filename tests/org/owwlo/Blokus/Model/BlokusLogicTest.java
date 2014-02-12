@@ -6,7 +6,11 @@ import java.awt.Point;
 import java.util.List;
 import java.util.Map;
 
+import org.cheat.client.GameApi.Delete;
 import org.cheat.client.GameApi.Operation;
+import org.cheat.client.GameApi.Set;
+import org.cheat.client.GameApi.SetVisibility;
+import org.cheat.client.GameApi.Shuffle;
 import org.cheat.client.GameApi.VerifyMove;
 import org.junit.After;
 import org.junit.Before;
@@ -15,15 +19,14 @@ import org.owwlo.Blokus.Constants;
 import org.owwlo.Blokus.Model.BlokusLogic.BoardListener;
 import org.owwlo.Blokus.Model.BlokusLogic.MovablePiece;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+
 public class BlokusLogicTest {
 	private BlokusLogic bl;
-
-	// private VerifyMove move(
-	// int lastMovePlayerId, Map<String, Object> lastState, List<Operation>
-	// lastMove) {
-	// return new VerifyMove(wId, playersInfo, emptyState,
-	// lastState, lastMove, lastMovePlayerId);
-	// }
+	
+	private final Map<String, Object> emptyState = ImmutableMap.<String, Object>of();
 
 	@Before
 	public void setUp() throws Exception {
@@ -66,9 +69,45 @@ public class BlokusLogicTest {
 		fail();
 	}
 
+	/**
+	 * @author Yoav Zibin
+	 */
+	List<Integer> getIndicesInRange(int fromInclusive, int toInclusive) {
+		List<Integer> keys = Lists.newArrayList();
+		for (int i = fromInclusive; i <= toInclusive; i++) {
+			keys.add(i);
+		}
+		return keys;
+	}
+
+	private VerifyMove createVerifyMove(int yourPlayerId,
+			List<Map<String, Object>> playersInfo, Map<String, Object> state,
+			Map<String, Object> lastState, List<Operation> lastMove,
+			int lastMovePlayerId) {
+		return new VerifyMove(yourPlayerId, playersInfo, state, lastState,
+				lastMove, lastMovePlayerId);
+	}
+
 	@Test
 	public void testCorrectMove() {
-		fail();
+		  Map<String, Object> info1 = ImmutableMap.<String, Object>of(Constants.JSON_USER_ID, 1);
+		  Map<String, Object> info2 = ImmutableMap.<String, Object>of(Constants.JSON_USER_ID, 2);
+		  List<Map<String, Object>> playersInfo = ImmutableList.of(info1, info2);
+		
+		Map<String, Object> state = ImmutableMap
+				.<String, Object> builder()
+				.put(Constants.JSON_TURN, 2)
+				.put(Constants.JSON_USER_LIST,
+						ImmutableList.<Integer> builder().add(1, 2))
+				.put(Constants.getPieceForUserString(1),
+						getIndicesInRange(0, 20))
+				.put(Constants.getPieceForUserString(2),
+						getIndicesInRange(0, 19)).build();
+
+		List<Operation> operations = ImmutableList.<Operation> of(new Set(
+				Constants.JSON_TURN, 1), new Set("pass", false), new Set(
+				"usePiece", 3), new Set("point", "0,0"));
+		createVerifyMove(2, playersInfo, state, emptyState, operations, 1);
 	}
 
 	@Test

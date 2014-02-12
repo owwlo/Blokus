@@ -97,4 +97,8 @@ public class Piece {
 		System.out.println("****************************");
 		System.out.println();
 	}
+	
+	public static Piece getPiece(int id) {
+		return new Piece(Constants.BlokusPiece.pieceStringList.get(id));
+	}
 }
