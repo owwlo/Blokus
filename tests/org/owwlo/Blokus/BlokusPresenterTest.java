@@ -18,7 +18,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 import org.owwlo.Blokus.BlokusPresenter.View;
+import org.owwlo.Blokus.BlokusPresenter.ViewState;
 import org.owwlo.Blokus.Model.BlokusLogic;
+import org.owwlo.Blokus.Model.BlokusState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -66,96 +68,94 @@ public class BlokusPresenterTest {
                 BlokusLogic.getMoveInitial(ImmutableList.<Integer> of(1, 2)));
     }
 
-    //
-    // /**
-    // * This part will fail because there is an 2D integer array being as a
-    // * parameter pass to view. Mockito can not treat the two as the same even
-    // if
-    // * the contents are the same.
-    // */
-    // @Test
-    // public void testEmptyMiddleStateForATurnOfA() {
-    // Map<String, Object> testState = ImmutableMap
-    // .<String, Object> builder()
-    // .put(Constants.JSON_TURN, 1)
-    // .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
-    // .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
-    // .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
-    // .put(Constants.JSON_USER_USED_PIECES,
-    // ImmutableMap.<String, List<Integer>> builder()
-    // .put("1", ImmutableList.<Integer> of(0))
-    // .put("2", ImmutableList.<Integer> of(1))
-    // .build()).build();
-    //
-    // blokusPresenter.updateUI(createUpdateUI(1, 1, testState));
-    // verify(mockView).setViewState(ViewState.MAKE_MOVE);
-    // verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
-    // BlokusState.getStateFromApiState(testState).getBitmap());
-    // verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
-    // }
-    //
-    // @Test
-    // public void testEmptyMiddleStateForATurnOfB() {
-    // Map<String, Object> testState = ImmutableMap
-    // .<String, Object> builder()
-    // .put(Constants.JSON_TURN, 1)
-    // .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
-    // .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
-    // .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
-    // .put(Constants.JSON_USER_USED_PIECES,
-    // ImmutableMap.<String, List<Integer>> builder()
-    // .put("1", ImmutableList.<Integer> of(0))
-    // .put("2", ImmutableList.<Integer> of(1))
-    // .build()).build();
-    //
-    // blokusPresenter.updateUI(createUpdateUI(1, 2, testState));
-    // verify(mockView).setViewState(ViewState.MAKE_MOVE);
-    // verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
-    // BlokusState.getStateFromApiState(testState).getBitmap());
-    // verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
-    // }
-    //
-    // @Test
-    // public void testEmptyMiddleStateForBTurnOfA() {
-    // Map<String, Object> testState = ImmutableMap
-    // .<String, Object> builder()
-    // .put(Constants.JSON_TURN, 1)
-    // .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
-    // .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
-    // .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
-    // .put(Constants.JSON_USER_USED_PIECES,
-    // ImmutableMap.<String, List<Integer>> builder()
-    // .put("1", ImmutableList.<Integer> of(0))
-    // .put("2", ImmutableList.<Integer> of(1))
-    // .build()).build();
-    //
-    // blokusPresenter.updateUI(createUpdateUI(2, 1, testState));
-    // verify(mockView).setViewState(ViewState.MAKE_MOVE);
-    // verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
-    // BlokusState.getStateFromApiState(testState).getBitmap());
-    // verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
-    // }
-    //
-    // @Test
-    // public void testEmptyMiddleStateForBTurnOfB() {
-    // Map<String, Object> testState = ImmutableMap
-    // .<String, Object> builder()
-    // .put(Constants.JSON_TURN, 1)
-    // .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
-    // .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
-    // .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
-    // .put(Constants.JSON_USER_USED_PIECES,
-    // ImmutableMap.<String, List<Integer>> builder()
-    // .put("1", ImmutableList.<Integer> of(0))
-    // .put("2", ImmutableList.<Integer> of(1))
-    // .build()).build();
-    //
-    // blokusPresenter.updateUI(createUpdateUI(2, 2, testState));
-    // verify(mockView).setViewState(ViewState.MAKE_MOVE);
-    // verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
-    // BlokusState.getStateFromApiState(testState).getBitmap());
-    // verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
-    // }
+    /**
+     * This part will fail because there is an 2D integer array being as a
+     * parameter pass to view. Mockito can not treat the two as the same even if
+     * the contents are the same.
+     */
+    @Test
+    public void testEmptyMiddleStateForATurnOfA() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(1, 1, testState));
+        verify(mockView).setViewState(ViewState.MAKE_MOVE);
+        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
+    }
+
+    @Test
+    public void testEmptyMiddleStateForATurnOfB() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(1, 2, testState));
+        verify(mockView).setViewState(ViewState.MAKE_MOVE);
+        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
+    }
+
+    @Test
+    public void testEmptyMiddleStateForBTurnOfA() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(2, 1, testState));
+        verify(mockView).setViewState(ViewState.MAKE_MOVE);
+        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
+    }
+
+    @Test
+    public void testEmptyMiddleStateForBTurnOfB() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(2, 2, testState));
+        verify(mockView).setViewState(ViewState.MAKE_MOVE);
+        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
+    }
 
     @Test
     public void testGameOverWinStateForA() {

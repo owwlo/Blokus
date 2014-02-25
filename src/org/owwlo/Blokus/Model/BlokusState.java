@@ -149,4 +149,17 @@ public class BlokusState {
         }
         return true;
     }
+
+    public String getBitmapStr() {
+        StringBuilder sb = new StringBuilder();
+        int boardsize = Constants.boardSizeMap.get(getPlayerList().size());
+        for (int y = 0; y < boardsize; y++) {
+            for (int x = 0; x < boardsize; x++) {
+                if (bitmap[y][x] != Constants.NO_OCCUPY_POINT_VALUE) {
+                    sb.append(y + "," + x + "," + bitmap[y][x] + " ");
+                }
+            }
+        }
+        return sb.toString().trim();
+    }
 }

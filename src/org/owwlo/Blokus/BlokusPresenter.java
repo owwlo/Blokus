@@ -31,7 +31,7 @@ public class BlokusPresenter {
 
         void setPresenter(BlokusPresenter cheatPresenter);
 
-        void setGameBoard(int yourPlayerId, List<Integer> playerList, int[][] bitmap);
+        void setGameBoard(int yourPlayerId, List<Integer> playerList, String bitmap);
 
         /*
          * Show Lose scene.
@@ -97,7 +97,7 @@ public class BlokusPresenter {
         boolean isItMyTurn = (yourPlayerId == currentState.getTurn());
 
         // No matter whose turn, Update the game board.
-        updateGameBoard(yourPlayerId, currentState.getPlayerList(), currentState.getBitmap());
+        updateGameBoard(yourPlayerId, currentState.getPlayerList(), currentState.getBitmapStr());
 
         if (isItMyTurn) {
             showPickAndMakeMoveScene(yourPlayerId, currentState.getPieceFromPlayer());
@@ -129,8 +129,8 @@ public class BlokusPresenter {
 
     }
 
-    private void updateGameBoard(int yourPlayerId, List<Integer> playerList, int[][] bitmap) {
-        view.setGameBoard(yourPlayerId, playerList, bitmap);
+    private void updateGameBoard(int yourPlayerId, List<Integer> playerList, String bitmapStr) {
+        view.setGameBoard(yourPlayerId, playerList, bitmapStr);
 
     }
 
