@@ -130,10 +130,9 @@ public class BlokusPresenterTest {
                                 .build()).build();
 
         blokusPresenter.updateUI(createUpdateUI(2, 1, testState));
-        verify(mockView).setViewState(ViewState.MAKE_MOVE);
-        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(2, ImmutableList.<Integer> of(1, 2),
                 BlokusState.getStateFromApiState(testState).getBitmapStr());
-        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
     }
 
     @Test
@@ -151,10 +150,9 @@ public class BlokusPresenterTest {
                                 .build()).build();
 
         blokusPresenter.updateUI(createUpdateUI(2, 2, testState));
-        verify(mockView).setViewState(ViewState.MAKE_MOVE);
-        verify(mockView).setGameBoard(1, ImmutableList.<Integer> of(1, 2),
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(2, ImmutableList.<Integer> of(1, 2),
                 BlokusState.getStateFromApiState(testState).getBitmapStr());
-        verify(mockView).pickFromValidPiece(Utils.getIndicesInRange(1, 20));
     }
 
     @Test
