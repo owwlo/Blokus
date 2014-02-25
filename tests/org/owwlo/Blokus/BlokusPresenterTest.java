@@ -263,6 +263,213 @@ public class BlokusPresenterTest {
         verify(mockView).gaofushuai();
     }
 
+    @Test
+    public void testEmptyStateForViewer() {
+        blokusPresenter.updateUI(createUpdateUI(3, 0, emptyState));
+        verify(mockContainer).sendMakeMove(
+                BlokusLogic.getMoveInitial(ImmutableList.<Integer> of(1, 2)));
+    }
+
+    @Test
+    public void testEmptyMiddleStateForATurnOfAViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 1, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testEmptyMiddleStateForATurnOfBViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testEmptyMiddleStateForBTurnOfAViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 1, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testEmptyMiddleStateForBTurnOfBViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of())
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverWinStateForAViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverWinStateForBViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1, 2, 3))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverLoseStateForAViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverLoseStateForBViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1, 2, 3))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverDrawStateForAViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1, 2))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
+    @Test
+    public void testGameOverDrawStateForBViewer() {
+        Map<String, Object> testState = ImmutableMap
+                .<String, Object> builder()
+                .put(Constants.JSON_TURN, 1)
+                .put(Constants.JSON_USER_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of(1, 2))
+                .put(Constants.JSON_BITMAP, "0,0,1 0,5,2 0,6,2")
+                .put(Constants.JSON_USER_USED_PIECES,
+                        ImmutableMap.<String, List<Integer>> builder()
+                                .put("1", ImmutableList.<Integer> of(0, 1))
+                                .put("2", ImmutableList.<Integer> of(1, 2))
+                                .build()).build();
+
+        blokusPresenter.updateUI(createUpdateUI(99, 2, testState));
+        verify(mockView).setViewState(ViewState.VIEW_ONLY);
+        verify(mockView).setGameBoard(99, ImmutableList.<Integer> of(1, 2),
+                BlokusState.getStateFromApiState(testState).getBitmapStr());
+    }
+
     private UpdateUI createUpdateUI(
             int yourPlayerId, int turnOfPlayerId, Map<String, Object> state) {
         return new UpdateUI(yourPlayerId, playersInfo, state,

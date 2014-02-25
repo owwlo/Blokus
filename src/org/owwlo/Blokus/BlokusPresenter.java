@@ -72,6 +72,14 @@ public class BlokusPresenter {
 
         currentState = BlokusState.getStateFromApiState(updateUI.getState());
 
+        // If there is no player id in player list, the player is a viewer.
+        if (!updateUI.getPlayerIds().contains(yourPlayerId)) {
+            disableUiAndWatch();
+            updateGameBoard(yourPlayerId
+                    , currentState.getPlayerList(), currentState.getBitmapStr());
+            return;
+        }
+
         // At this situation, there is a winner. Game Over.
         if (currentState.getPassList().size() == currentState.getPlayerList().size()) {
             int maxUsedPiece = -1;
