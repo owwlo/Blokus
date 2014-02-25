@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.cheat.client.GameApi.EndGame;
 import org.cheat.client.GameApi.Operation;
 import org.cheat.client.GameApi.Set;
+import org.cheat.client.GameApi.SetTurn;
 import org.cheat.client.GameApi.VerifyMove;
 import org.cheat.client.GameApi.VerifyMoveDone;
 import org.owwlo.Blokus.Constants;
@@ -20,6 +21,7 @@ import org.owwlo.Blokus.Utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * A Board item used in Blokus.
@@ -315,6 +317,12 @@ public class BlokusLogic {
             position = new Point();
         }
 
+        public MovablePiece(int ownid, Piece piece, Point point) {
+            super(piece);
+            ownerId = ownid;
+            position = point;
+        }
+
         public MovablePiece(int ownid, String data, Point point) {
             super(data);
             ownerId = ownid;
@@ -519,11 +527,11 @@ public class BlokusLogic {
         return BlokusState.getStateFromApiState(lastStateMap);
     }
 
-    private static boolean checkInitialMoveForPlayer(int lastMovePlayerId,
+    public static boolean checkInitialMoveForPlayer(int playerId,
             int[][] boardBitmap, int len) {
         for (int i = 0; i < len; i++) {
             for (int j = 0; j < len; j++) {
-                if (boardBitmap[i][j] == lastMovePlayerId) {
+                if (boardBitmap[i][j] == playerId) {
                     return false;
                 }
             }
@@ -535,8 +543,8 @@ public class BlokusLogic {
             List<Map<String, Object>> playersInfo, Map<String, Object> state,
             Map<String, Object> lastState, List<Operation> lastMove,
             int lastMovePlayerId) {
-        return new VerifyMove(yourPlayerId, playersInfo, state, lastState,
-                lastMove, lastMovePlayerId);
+        return new VerifyMove(playersInfo, state, lastState, lastMove, lastMovePlayerId,
+                ImmutableMap.<Integer, Integer> of());
     }
 
     public static void main(String[] args) {
@@ -575,5 +583,30 @@ public class BlokusLogic {
                         Constants.JSON_POINT, "1,4"));
         System.out.println(BlokusLogic.verify(createVerifyMove(1, playersInfo,
                 currentState, lastState, operationsFor2, 2)));
+    }
+
+    public static List<Operation> getPassMeOperations(BlokusState currentState) {
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new SetTurn(currentState.getTurn()));
+        ops.add(new Set(Constants.JSON_PASS, true));
+        return ops;
+    }
+
+    public static List<Operation> getMakeMoveOperations(BlokusState currentState, int pieceId,
+            int rotation, Point pos) {
+        List<Operation> ops = ImmutableList.<Operation> of(new SetTurn(
+                currentState.getTurn()), new Set(Constants.JSON_PASS, false),
+                new Set(Constants.JSON_ROTATION, rotation),
+                new Set(Constants.JSON_USE_PIECE, pieceId), new Set(
+                        Constants.JSON_POINT, pos.y + "," + pos.x));
+        return ops;
+    }
+
+    public static List<Operation> getMoveInitial(List<Integer> playerIds) {
+        int playerAId = playerIds.get(0);
+        int playerBId = playerIds.get(1);
+        List<Operation> operations = Lists.newArrayList();
+        operations.add(new SetTurn(playerAId));
+        return operations;
     }
 }

@@ -47,4 +47,26 @@ public class Utils {
         }
         return keys;
     }
+
+    public static int[][] getBitmapFromPointStr(String str) {
+        return getBitmapFromPointStr(str, 14);
+    }
+
+    public static int[][] getBitmapFromPointStr(String str, int size) {
+        int[][] bitmap;
+        bitmap = new int[size][size];
+        Utils.fillBoard(bitmap, size, Constants.NO_OCCUPY_POINT_VALUE);
+        String[] bitmapStrSpl = str.split(" ");
+        for (String s : bitmapStrSpl) {
+            if (s.length() <= 1) {
+                continue;
+            }
+            String[] inner = s.split(",");
+            int row = Integer.parseInt(inner[0]);
+            int col = Integer.parseInt(inner[1]);
+            int color = Integer.parseInt(inner[2]);
+            bitmap[row][col] = color;
+        }
+        return bitmap;
+    }
 }

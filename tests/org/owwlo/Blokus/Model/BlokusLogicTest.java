@@ -213,8 +213,8 @@ public class BlokusLogicTest {
             List<Map<String, Object>> playersInfo, Map<String, Object> state,
             Map<String, Object> lastState, List<Operation> lastMove,
             int lastMovePlayerId) {
-        return new VerifyMove(yourPlayerId, playersInfo, state, lastState,
-                lastMove, lastMovePlayerId);
+        return new VerifyMove(playersInfo, state, lastState,
+                lastMove, lastMovePlayerId, ImmutableMap.<Integer, Integer> of());
     }
 
     @Test

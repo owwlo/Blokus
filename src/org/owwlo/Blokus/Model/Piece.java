@@ -17,6 +17,13 @@ public class Piece {
     private List<Point> pointList = new ArrayList<Point>();
     private boolean[][] pointBitmap = null;
     private int xMax = 0, yMax = 0;
+    private int rotation = 0;
+
+    /*
+     * If the piece is not create by data string, the id for this piece will be
+     * -1.
+     */
+    private int pieceId = -1;
 
     public final List<Point> getPointList() {
         return pointList;
@@ -55,12 +62,20 @@ public class Piece {
      * @param s The string contain data for Piece.
      */
     public void setPointFromString(String s) {
+        pieceId = Constants.BlokusPiece.pieceStringList.indexOf(s);
         String[] strs = s.split(";");
         for (String str : strs) {
             String[] pos = str.split(",");
             Point point = new Point(Integer.parseInt(pos[1]), Integer.parseInt(pos[0]));
             addPoint(point);
         }
+    }
+
+    public Piece(Piece p) {
+        for (Point point : p.getPointList()) {
+            addPoint(point);
+        }
+        this.pieceId = p.getId();
     }
 
     /**
@@ -120,5 +135,13 @@ public class Piece {
 
     public void rotate() {
         // TODO implement it
+    }
+
+    public final int getRotation() {
+        return rotation;
+    }
+
+    public final int getId() {
+        return pieceId;
     }
 }
