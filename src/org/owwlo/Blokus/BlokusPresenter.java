@@ -1,25 +1,26 @@
 
 package org.owwlo.Blokus;
 
-import java.awt.Point;
 import java.util.List;
 import java.util.Map;
 
-import org.cheat.client.GameApi.Container;
-import org.cheat.client.GameApi.UpdateUI;
 import org.owwlo.Blokus.Model.BlokusLogic;
 import org.owwlo.Blokus.Model.BlokusLogic.MovablePiece;
 import org.owwlo.Blokus.Model.BlokusState;
 import org.owwlo.Blokus.Model.Piece;
+import org.owwlo.Blokus.Model.Point;
+import org.owwlo.Blokus.Shared.GameApi.Container;
+import org.owwlo.Blokus.Shared.GameApi.UpdateUI;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 public class BlokusPresenter {
-    enum ViewState {
+    public enum ViewState {
         VIEW_ONLY, MAKE_MOVE
     }
 
-    interface View {
+    public interface View {
         void pickFromValidPiece(List<Integer> pieces);
 
         /*
@@ -42,6 +43,8 @@ public class BlokusPresenter {
          * Show Win scene.
          */
         void gaofushuai();
+
+        void cleanTryBlock();
     }
 
     private final View view;
@@ -65,12 +68,15 @@ public class BlokusPresenter {
 
         // At this time, the state is empty so the game just begins. Game
         // needs to be initialized.
-        if (updateUI.getState().isEmpty()) {
+        if (updateUI.getState().isEmpty()
+                && yourPlayerId == Ordering.<Integer> natural().min(updateUI.getPlayerIds())) {
+            System.out.println(updateUI.getPlayerIds());
+            System.out.println(yourPlayerId);
             sendInitialMove(updateUI.getPlayerIds());
             return;
         }
 
-        currentState = BlokusState.getStateFromApiState(updateUI.getState());
+        currentState = BlokusState.getStateFromApiState(updateUI.getState(), yourPlayerId);
 
         // If there is no player id in player list, the player is a viewer.
         if (!updateUI.getPlayerIds().contains(yourPlayerId)) {
@@ -142,7 +148,7 @@ public class BlokusPresenter {
 
     }
 
-    void chosePiece(int pieceId) {
+    public void chosePiece(int pieceId) {
         chosePiece = Piece.getPiece(pieceId);
     }
 
@@ -150,19 +156,18 @@ public class BlokusPresenter {
      * Because there is rotation in piece so it is false to pass just the id of
      * piece.
      */
-    void tryCurrentPieceWithPosition(Piece piece, Point pos) {
+    public void tryCurrentPieceWithPosition(Piece piece, Point pos) {
         boolean canFit = BlokusLogic.canFit(currentState,
                 new MovablePiece(yourPlayerId, piece, pos), BlokusLogic
                         .checkInitialMoveForPlayer(yourPlayerId, currentState.getBitmap(),
                                 Constants.boardSizeMap.get(currentState.getPlayerList().size())));
+        view.cleanTryBlock();
         if (canFit) {
             view.updateTryBlock(piece, pos);
-        } else {
-            view.updateTryBlock(null, null);
         }
     }
 
-    void makeMove(Piece piece, Point pos) {
+    public void makeMove(Piece piece, Point pos) {
         boolean canFit = BlokusLogic.canFit(currentState,
                 new MovablePiece(yourPlayerId, piece, pos), BlokusLogic
                         .checkInitialMoveForPlayer(yourPlayerId, currentState.getBitmap(),
@@ -173,11 +178,11 @@ public class BlokusPresenter {
         }
     }
 
-    void passMyTurn() {
+    public void passMyTurn() {
         container.sendMakeMove(BlokusLogic.getPassMeOperations(currentState));
     }
 
-    void rotateCurrentPiece() {
+    public void rotateCurrentPiece() {
         if (chosePiece != null) {
             chosePiece.rotate();
         }

@@ -1,7 +1,6 @@
 
 package org.owwlo.Blokus;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,10 @@ public class Constants {
 
     public static final String getPieceForUserString(int userId) {
         return "pieceFor" + userId;
+    }
+
+    public static enum Color {
+        BLACK, WHITE
     }
 
     private static final List<Color> assignColorList = ImmutableList.of(Color.BLACK, Color.WHITE);

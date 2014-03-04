@@ -8,14 +8,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
-import org.cheat.client.GameApi.Operation;
-import org.cheat.client.GameApi.Set;
-import org.cheat.client.GameApi.VerifyMove;
-import org.cheat.client.GameApi.VerifyMoveDone;
 import org.junit.Before;
 import org.junit.Test;
 import org.owwlo.Blokus.Constants;
 import org.owwlo.Blokus.Model.BlokusLogic.BoardListener;
+import org.owwlo.Blokus.Shared.GameApi.Operation;
+import org.owwlo.Blokus.Shared.GameApi.Set;
+import org.owwlo.Blokus.Shared.GameApi.VerifyMove;
+import org.owwlo.Blokus.Shared.GameApi.VerifyMoveDone;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

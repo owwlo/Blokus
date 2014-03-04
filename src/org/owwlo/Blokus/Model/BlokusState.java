@@ -49,6 +49,17 @@ public class BlokusState {
         return turn;
     }
 
+    public final int getOppositeId() {
+        int id = 0;
+        for (int i : playerList) {
+            if (i != turn) {
+                id = i;
+                break;
+            }
+        }
+        return id;
+    }
+
     public final Map<Integer, List<Integer>> getPieceFromPlayer() {
         Map<Integer, List<Integer>> rtn = Maps.newHashMap();
         for (int playerId : playerList) {
@@ -80,7 +91,13 @@ public class BlokusState {
     @SuppressWarnings("unchecked")
     public static BlokusState getStateFromApiState(
             Map<String, Object> gameApiState) {
-        int turn = (int) gameApiState.get(Constants.JSON_TURN);
+        return getStateFromApiState(
+                gameApiState, (Integer) gameApiState.get(Constants.JSON_TURN));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static BlokusState getStateFromApiState(
+            Map<String, Object> gameApiState, int turn) {
         List<Integer> userList = (List<Integer>) gameApiState
                 .get(Constants.JSON_USER_LIST);
         List<Integer> passList = new ArrayList<>((List<Integer>) gameApiState
