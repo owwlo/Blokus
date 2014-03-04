@@ -1,27 +1,27 @@
 
 package org.owwlo.Blokus.Model;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.cheat.client.GameApi.EndGame;
-import org.cheat.client.GameApi.Operation;
-import org.cheat.client.GameApi.Set;
-import org.cheat.client.GameApi.SetTurn;
-import org.cheat.client.GameApi.VerifyMove;
-import org.cheat.client.GameApi.VerifyMoveDone;
 import org.owwlo.Blokus.Constants;
 import org.owwlo.Blokus.Constants.BlokusPiece;
 import org.owwlo.Blokus.Utils;
+import org.owwlo.Blokus.Shared.GameApi.EndGame;
+import org.owwlo.Blokus.Shared.GameApi.Operation;
+import org.owwlo.Blokus.Shared.GameApi.Set;
+import org.owwlo.Blokus.Shared.GameApi.SetTurn;
+import org.owwlo.Blokus.Shared.GameApi.VerifyMove;
+import org.owwlo.Blokus.Shared.GameApi.VerifyMoveDone;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
 /**
  * A Board item used in Blokus.
@@ -392,9 +392,7 @@ public class BlokusLogic {
             checkMoveIsLegal(verifyMove);
             return new VerifyMoveDone();
         } catch (Exception e) {
-            if (Constants.DEBUG) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
             return new VerifyMoveDone(verifyMove.getLastMovePlayerId(),
                     e.getMessage());
         }
@@ -415,9 +413,33 @@ public class BlokusLogic {
                 verifyMove.getLastState());
         Map<String, Object> currentStateMap = verifyMove.getState();
         int lastPlayerId = verifyMove.getLastMovePlayerId();
+        int otherPlayerId = 0;
+        for (int id : verifyMove.getPlayerIds()) {
+            if (id != lastPlayerId) {
+                otherPlayerId = id;
+                break;
+            }
+        }
 
-        BlokusState lastState = getStateFromApiState(lastStateMap);
-        BlokusState currentState = getStateFromApiState(currentStateMap);
+        // This is the initial move. No need to verify.
+        if (lastStateMap.isEmpty() && currentStateMap.isEmpty()) {
+            return;
+        }
+
+        System.out.println("lastState:");
+        System.out.println(lastStateMap);
+        System.out.println("currentState:");
+        System.out.println(currentStateMap);
+
+        System.out.println("lastPlayerId:" + lastPlayerId);
+
+        // The player in this side will make a move. Ignore verification.
+        if (lastStateMap.isEmpty() && !currentStateMap.isEmpty()) {
+            return;
+        }
+
+        BlokusState lastState = getStateFromApiState(lastStateMap, lastPlayerId);
+        BlokusState currentState = getStateFromApiState(currentStateMap, otherPlayerId);
         Map<String, Operation> operationSetMap = new HashMap<>();
 
         boolean hasPassOperation = false;
@@ -438,11 +460,13 @@ public class BlokusLogic {
         }
 
         for (Operation op : lastMove) {
-            if (op instanceof Set) {
+            if (op instanceof SetTurn) {
+                lastStateMap.put(Constants.JSON_TURN, ((SetTurn) op).getPlayerId());
+            } else if (op instanceof Set) {
                 Set set = ((Set) op);
                 String key = set.getKey();
                 if (key.equals(Constants.JSON_TURN)) {
-                    lastStateMap.put(Constants.JSON_TURN, (int) set.getValue());
+                    lastStateMap.put(Constants.JSON_TURN, (Integer) set.getValue());
                 } else if (key.equals(Constants.JSON_PASS)) {
                     if (!(Boolean) set.getValue()) {
                         Set usePieceAction = (Set) operationSetMap
@@ -450,7 +474,7 @@ public class BlokusLogic {
                         Set usePointAction = (Set) operationSetMap
                                 .get(Constants.JSON_POINT);
 
-                        int pieceIndex = (int) usePieceAction.getValue();
+                        int pieceIndex = (Integer) usePieceAction.getValue();
                         String[] pointOrd = ((String) (usePointAction
                                 .getValue())).split(",");
                         Point usePoint = new Point(
@@ -469,30 +493,39 @@ public class BlokusLogic {
                                         Constants.boardSizeMap.get(lastState
                                                 .getPlayerList().size())));
                         if (isFit) {
-                            String appendedBmpStr = lastState.getBitmapString()
-                                    + " " + StringUtils.join(pointOrd, ",") + "," + lastPlayerId;
-
-                            // Update Bitmap.
-                            lastStateMap.put(Constants.JSON_BITMAP, appendedBmpStr);
-
-                            // Update used piece list.
-                            Map<String, List<Integer>> usedPieces = new HashMap<>(
-                                    lastState.getEveryPlayerUsedPiece());
-                            List<Integer> usedListForPlayer = new ArrayList<>(usedPieces.get(""
-                                    + lastPlayerId));
-
-                            if (usedListForPlayer.contains(pieceIndex)) {
-                                throw new Exception("piece reused.");
-                            }
-
-                            usedListForPlayer.add(pieceIndex);
-                            usedPieces.put("" + lastPlayerId, usedListForPlayer);
-                            lastStateMap.put(Constants.JSON_USER_USED_PIECES, usedPieces);
-
-                            BlokusState newState = BlokusState.getStateFromApiState(lastStateMap);
-                            if (!BlokusState.equal(newState, currentState)) {
-                                throw new Exception("states not unified");
-                            }
+                            // String appendedBmpStr =
+                            // lastState.getBitmapString()
+                            // + " " + Joiner.on(",").join(pointOrd) + "," +
+                            // lastPlayerId;
+                            //
+                            // // Update Bitmap.
+                            // lastStateMap.put(Constants.JSON_BITMAP,
+                            // appendedBmpStr);
+                            //
+                            // // Update used piece list.
+                            // Map<String, List<Integer>> usedPieces = new
+                            // HashMap<>(
+                            // lastState.getEveryPlayerUsedPiece());
+                            // List<Integer> usedListForPlayer = new
+                            // ArrayList<>(usedPieces.get(""
+                            // + lastPlayerId));
+                            //
+                            // if (usedListForPlayer.contains(pieceIndex)) {
+                            // throw new Exception("piece reused.");
+                            // }
+                            //
+                            // usedListForPlayer.add(pieceIndex);
+                            // usedPieces.put("" + lastPlayerId,
+                            // usedListForPlayer);
+                            // lastStateMap.put(Constants.JSON_USER_USED_PIECES,
+                            // usedPieces);
+                            //
+                            // BlokusState newState =
+                            // BlokusState.getStateFromApiState(lastStateMap,
+                            // lastPlayerId);
+                            // if (!BlokusState.equal(newState, currentState)) {
+                            // throw new Exception("states not unified");
+                            // }
                         } else {
                             throw new Exception("No fit");
                         }
@@ -505,7 +538,8 @@ public class BlokusLogic {
                         } else {
                             lastState.addPassId(lastPlayerId);
                             lastStateMap.put(Constants.JSON_PASS_LIST, lastState.getPassList());
-                            BlokusState newState = BlokusState.getStateFromApiState(lastStateMap);
+                            BlokusState newState = BlokusState.getStateFromApiState(lastStateMap,
+                                    lastPlayerId);
                             if (!BlokusState.equal(newState, currentState)) {
                                 throw new Exception("states not unified in pass");
                             }
@@ -523,8 +557,8 @@ public class BlokusLogic {
     }
 
     private static BlokusState getStateFromApiState(
-            Map<String, Object> lastStateMap) {
-        return BlokusState.getStateFromApiState(lastStateMap);
+            Map<String, Object> lastStateMap, int playerId) {
+        return BlokusState.getStateFromApiState(lastStateMap, playerId);
     }
 
     public static boolean checkInitialMoveForPlayer(int playerId,
@@ -587,26 +621,59 @@ public class BlokusLogic {
 
     public static List<Operation> getPassMeOperations(BlokusState currentState) {
         List<Operation> ops = new ArrayList<>();
-        ops.add(new SetTurn(currentState.getTurn()));
+        List<Integer> newPassList = Lists.newArrayList(currentState.getPassList());
+        newPassList.add(currentState.getTurn());
+        ops.add(new SetTurn(currentState.getOppositeId()));
         ops.add(new Set(Constants.JSON_PASS, true));
+        ops.add(new Set(Constants.JSON_PASS_LIST, newPassList));
         return ops;
     }
 
     public static List<Operation> getMakeMoveOperations(BlokusState currentState, int pieceId,
             int rotation, Point pos) {
+        String bitmap = currentState.getBitmapString();
+
+        // Generate bitmap for new state.
+        Piece piece = Piece.getPiece(pieceId);
+        piece.rotate(rotation);
+        List<Point> pointList = piece.getPointList();
+        StringBuilder sb = new StringBuilder();
+        for (Point p : pointList) {
+            sb.append((pos.x + p.x) + "," + (pos.y + p.y) + "," + currentState.getTurn() + " ");
+        }
+        String newAppendBitmap = sb.toString().trim();
+
+        String newBitmap = bitmap + " " + newAppendBitmap;
+
+        // Modify old used piece list.
+        List<Integer> newUsedList = Lists.newArrayList(currentState.getEveryPlayerUsedPiece().get(
+                "" + currentState.getTurn()));
+        newUsedList.add(pieceId);
+        Map<String, List<Integer>> newUsedMap = Maps.newHashMap(currentState
+                .getEveryPlayerUsedPiece());
+        newUsedMap.put("" + currentState.getTurn(), newUsedList);
+
         List<Operation> ops = ImmutableList.<Operation> of(new SetTurn(
-                currentState.getTurn()), new Set(Constants.JSON_PASS, false),
+                currentState.getOppositeId()), new Set(Constants.JSON_PASS, false),
                 new Set(Constants.JSON_ROTATION, rotation),
                 new Set(Constants.JSON_USE_PIECE, pieceId), new Set(
-                        Constants.JSON_POINT, pos.y + "," + pos.x));
+                        Constants.JSON_POINT, pos.x + "," + pos.y),
+                new Set(Constants.JSON_BITMAP, newBitmap),
+                new Set(Constants.JSON_USER_USED_PIECES, newUsedMap));
         return ops;
     }
 
     public static List<Operation> getMoveInitial(List<Integer> playerIds) {
-        int playerAId = playerIds.get(0);
-        int playerBId = playerIds.get(1);
         List<Operation> operations = Lists.newArrayList();
-        operations.add(new SetTurn(playerAId));
+        operations.add(new SetTurn(Ordering.<Integer> natural().max(playerIds)));
+        operations.add(new Set(Constants.JSON_USER_LIST, playerIds));
+        operations.add(new Set(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of()));
+        operations.add(new Set(Constants.JSON_BITMAP, ""));
+        Map<String, List<Integer>> usedMap = Maps.newHashMap();
+        for (int id : playerIds) {
+            usedMap.put("" + id, ImmutableList.<Integer> of());
+        }
+        operations.add(new Set(Constants.JSON_USER_USED_PIECES, usedMap));
         return operations;
     }
 }
