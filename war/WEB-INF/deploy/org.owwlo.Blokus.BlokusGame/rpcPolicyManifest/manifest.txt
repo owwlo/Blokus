@@ -1,2 +1,0 @@
-# Module org.owwlo.Blokus.BlokusGame
-# RPC service class, partial path of RPC policy file

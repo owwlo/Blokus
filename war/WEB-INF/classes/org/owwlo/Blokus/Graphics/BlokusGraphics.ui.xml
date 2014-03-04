@@ -1,9 +1,0 @@
-<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<g:HorizontalPanel height="500px" width="500px">
-		<g:VerticalPanel ui:field="buttonContainer">
-		</g:VerticalPanel>
-	</g:HorizontalPanel>
-
-</ui:UiBinder> 
