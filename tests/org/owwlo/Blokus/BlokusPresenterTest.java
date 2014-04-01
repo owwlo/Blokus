@@ -7,6 +7,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.List;
 import java.util.Map;
 
+import org.game_api.GameApi.Container;
+import org.game_api.GameApi.Operation;
+import org.game_api.GameApi.SetTurn;
+import org.game_api.GameApi.UpdateUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,10 +21,6 @@ import org.owwlo.Blokus.BlokusPresenter.View;
 import org.owwlo.Blokus.BlokusPresenter.ViewState;
 import org.owwlo.Blokus.Model.BlokusLogic;
 import org.owwlo.Blokus.Model.BlokusState;
-import org.owwlo.Blokus.Shared.GameApi.Container;
-import org.owwlo.Blokus.Shared.GameApi.Operation;
-import org.owwlo.Blokus.Shared.GameApi.SetTurn;
-import org.owwlo.Blokus.Shared.GameApi.UpdateUI;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

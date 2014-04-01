@@ -16,18 +16,18 @@ public class BlokusState {
      * One thing important to know is that if the turn is 0 that means there is
      * no last player in the game.
      */
-    private final int turn;
+    private final String turn;
 
-    private List<Integer> playerList;
+    private List<String> playerList;
     private int[][] bitmap;
     private Map<String, List<Integer>> everyPlayerUsedPiece;
     private String bitmapString;
-    private List<Integer> passList;
+    private List<String> passList;
 
-    public BlokusState(int turn,
-            List<Integer> playerList, int[][] bitmap,
+    public BlokusState(String turn,
+            List<String> playerList, int[][] bitmap,
             Map<String, List<Integer>> everyPlayerUsedPiece, String bitmapString,
-            List<Integer> passList) {
+            List<String> passList) {
         super();
         this.turn = turn;
         this.playerList = playerList;
@@ -37,22 +37,22 @@ public class BlokusState {
         this.passList = passList;
     }
 
-    public void addPassId(int id) {
+    public void addPassId(String id) {
         passList.add(id);
     }
 
-    public final List<Integer> getPassList() {
+    public final List<String> getPassList() {
         return passList;
     }
 
-    public final int getTurn() {
+    public final String getTurn() {
         return turn;
     }
 
-    public final int getOppositeId() {
-        int id = 0;
-        for (int i : playerList) {
-            if (i != turn) {
+    public final String getOppositeId() {
+        String id = "";
+        for (String i : playerList) {
+            if (!i.equals(turn)) {
                 id = i;
                 break;
             }
@@ -60,9 +60,9 @@ public class BlokusState {
         return id;
     }
 
-    public final Map<Integer, List<Integer>> getPieceFromPlayer() {
-        Map<Integer, List<Integer>> rtn = Maps.newHashMap();
-        for (int playerId : playerList) {
+    public final Map<String, List<Integer>> getPieceFromPlayer() {
+        Map<String, List<Integer>> rtn = Maps.newHashMap();
+        for (String playerId : playerList) {
             rtn.put(playerId, Utils.getIndicesInRange(0, 20)); // There are 20
                                                                // pieces in
                                                                // total.
@@ -72,7 +72,7 @@ public class BlokusState {
         return rtn;
     }
 
-    public final List<Integer> getPlayerList() {
+    public final List<String> getPlayerList() {
         return playerList;
     }
 
@@ -92,15 +92,15 @@ public class BlokusState {
     public static BlokusState getStateFromApiState(
             Map<String, Object> gameApiState) {
         return getStateFromApiState(
-                gameApiState, (Integer) gameApiState.get(Constants.JSON_TURN));
+                gameApiState, (String) gameApiState.get(Constants.JSON_TURN));
     }
 
     @SuppressWarnings("unchecked")
     public static BlokusState getStateFromApiState(
-            Map<String, Object> gameApiState, int turn) {
-        List<Integer> userList = (List<Integer>) gameApiState
+            Map<String, Object> gameApiState, String turn) {
+        List<String> userList = (List<String>) gameApiState
                 .get(Constants.JSON_USER_LIST);
-        List<Integer> passList = new ArrayList<>((List<Integer>) gameApiState
+        List<String> passList = new ArrayList<>((List<String>) gameApiState
                 .get(Constants.JSON_PASS_LIST));
         Map<String, List<Integer>> usedUsedPieceAll = (Map<String, List<Integer>>) gameApiState
                 .get(Constants.JSON_USER_USED_PIECES);
@@ -132,7 +132,7 @@ public class BlokusState {
         if (a.getPlayerList().size() != b.getPlayerList().size()) {
             return false;
         } else {
-            for (int i : a.getPlayerList()) {
+            for (String i : a.getPlayerList()) {
                 if (!b.getPlayerList().contains(i)) {
                     return false;
                 }

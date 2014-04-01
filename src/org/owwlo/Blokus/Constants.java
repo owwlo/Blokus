@@ -26,6 +26,8 @@ public class Constants {
 
     public static final Map<Integer, Integer> boardSizeMap = ImmutableMap
             .<Integer, Integer> of(2, 14, 4, 21);
+    
+    public static final int SELECT_PIECE_SHOW_SIZE = 5;
 
     public static final String getPieceForUserString(int userId) {
         return "pieceFor" + userId;

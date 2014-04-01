@@ -1,9 +1,23 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<g:HorizontalPanel height="500px" width="500px">
-		<g:VerticalPanel ui:field="buttonContainer">
-		</g:VerticalPanel>
-	</g:HorizontalPanel>
-
+	<g:VerticalPanel height="600px" width="600px">
+		<g:HorizontalPanel>
+			<g:VerticalPanel ui:field="buttonContainer"
+				styleName="margined">
+			</g:VerticalPanel>
+			<g:VerticalPanel styleName="margined">
+				<g:Label styleName="margined">Next Piece</g:Label>
+				<g:VerticalPanel ui:field="currentPieceContainer"
+					styleName="margined">
+				</g:VerticalPanel>
+				<g:Button ui:field="passButton" styleName="margined">Pass this Round</g:Button>
+				<g:Label ui:field="drop_part" styleName="margined">Drop Me Here</g:Label>
+				<g:Label ui:field="drag_part" styleName="margined">Drag Me</g:Label>
+			</g:VerticalPanel>
+		</g:HorizontalPanel>
+		<g:Label styleName="margined">Available Pieces</g:Label>
+		<g:FlowPanel ui:field="pieceSelectContainer" styleName="margined">
+		</g:FlowPanel>
+	</g:VerticalPanel>
 </ui:UiBinder> 
