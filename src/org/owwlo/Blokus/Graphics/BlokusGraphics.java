@@ -15,7 +15,6 @@ import org.owwlo.Blokus.Model.Point;
 
 import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.allen_sauer.gwt.dnd.client.drop.BoundaryDropController;
 import com.allen_sauer.gwt.dnd.client.drop.SimpleDropController;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
@@ -30,7 +29,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -59,8 +57,8 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
   private SoundController soundController = new SoundController();
   private Sound sound = soundController.createSound(Sound.MIME_TYPE_AUDIO_WAV_PCM,
       "pieceDown.wav");
-  private PickupDragController dragController;
-  private SimpleDropController dropController;
+  private PickupDragController pieceSelectionDragController;
+  private SimpleDropController pieceSelectionDropController;
 
   interface BlokusGraphicsUiBinder extends UiBinder<Widget, BlokusGraphics> {
   }
@@ -70,13 +68,11 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
   @UiField
   VerticalPanel currentPieceContainer;
   @UiField
+  VerticalPanel currentPieceDropContainer;
+  @UiField
   FlowPanel pieceSelectContainer;
   @UiField
   Button passButton;
-  @UiField
-  Label drag_part;
-  @UiField
-  Label drop_part;
 
   @UiHandler("passButton")
   void onClickPassButton(ClickEvent e) {
@@ -87,32 +83,60 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
     PieceImages pieceImages = GWT.create(PieceImages.class);
     this.pieceImageSupplier = new PieceImageSupplier(pieceImages);
     initWidget(uiBinder.createAndBindUi(this));
-    dragController = new PickupDragController(RootPanel.get(), false);
-    dragController.makeDraggable(drag_part);
-    dropController = new TestDropController(drop_part);
-    dragController.registerDropController(dropController);
+
+    setPieceSelectionDropAreaVisible(false);
+
+    pieceSelectionDragController = new PickupDragController(RootPanel.get(), false) {
+      @Override
+      public void dragStart() {
+        setPieceSelectionDropAreaVisible(true);
+        super.dragStart();
+      }
+
+      @Override
+      public void dragEnd() {
+        setPieceSelectionDropAreaVisible(false);
+        super.dragEnd();
+      }
+    };
+    pieceSelectionDragController.setBehaviorDragStartSensitivity(1);
+    pieceSelectionDropController = new PieceSelectionDropController(currentPieceDropContainer);
+    pieceSelectionDragController.registerDropController(pieceSelectionDropController);
+
     initBoard();
     initPieceSelectArea();
     initCurrentPieceArea();
     initConfig();
   }
 
-  class TestDropController extends SimpleDropController {
-    public TestDropController(Widget dropTarget) {
+  private void setPieceSelectionDropAreaVisible(boolean b) {
+    currentPieceContainer.setVisible(!b);
+    currentPieceDropContainer.setVisible(b);
+  }
+
+  class PieceSelectionDropController extends SimpleDropController {
+
+    public PieceSelectionDropController(Widget dropTarget) {
       super(dropTarget);
     }
+
     @Override
     public void onDrop(DragContext context) {
+      int idx = -1;
       for (Widget w : context.selectedWidgets) {
-        if(w instanceof Label) {
-          w.setVisible(false);
-          BlokusGraphics.this.drop_part.setText("You have dropped here!");
+        if (w instanceof Image) {
+          idx = pendingImages.indexOf(w);
         }
       }
+      if (idx != -1) {
+        choseNewPiece(idx);
+        initPieceSelectArea();
+      }
       super.onDrop(context);
+      setPieceSelectionDropAreaVisible(false);
     }
   }
-  
+
   private void initConfig() {
     setViewState(ViewState.VIEW_ONLY);
   }
@@ -171,6 +195,7 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
   }
 
   private void initPieceSelectArea() {
+    pieceSelectContainer.clear();
     pendingImages = createImages(Utils.getIndicesInRange(1, 21), true);
     for (Image img : pendingImages) {
       img.setSize("50px", "50px");
@@ -182,6 +207,8 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
     List<Image> res = Lists.newArrayList();
     for (final int idx : pieceIdx) {
       final Image image = new Image(pieceImageSupplier.getResource(idx));
+      image.setStyleName("imageBtn");
+      pieceSelectionDragController.makeDraggable(image);
       if (withClick) {
         image.addClickHandler(new ClickHandler() {
           @Override
@@ -256,12 +283,11 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
       }
       buttonContainer.add(hpInner);
     }
-    BoundaryDropController dropController = new BoundaryDropController(RootPanel.get(), false);
-    dragController.registerDropController(dropController);
   }
 
   @Override
   public void pickFromValidPiece(List<Integer> pieces) {
+    initPieceSelectArea();
     for (Image img : pendingImages) {
       img.setVisible(false);
     }
@@ -307,7 +333,7 @@ public class BlokusGraphics extends Composite implements BlokusPresenter.View {
     }
     tryPoint.clear();
   }
-
+  
   @Override
   public void setPresenter(BlokusPresenter blokusPresenter) {
     this.blokusPresenter = blokusPresenter;

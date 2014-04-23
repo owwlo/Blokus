@@ -1,23 +1,31 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<g:VerticalPanel height="600px" width="600px">
+	<g:VerticalPanel height="100%" width="100%" styleName="maxWidthFixedDiv">
 		<g:HorizontalPanel>
 			<g:VerticalPanel ui:field="buttonContainer"
 				styleName="margined">
 			</g:VerticalPanel>
+		</g:HorizontalPanel>
+		<g:HorizontalPanel>
 			<g:VerticalPanel styleName="margined">
 				<g:Label styleName="margined">Next Piece</g:Label>
 				<g:VerticalPanel ui:field="currentPieceContainer"
 					styleName="margined">
 				</g:VerticalPanel>
+				<g:VerticalPanel width="150px" height="150px"
+					ui:field="currentPieceDropContainer" horizontalAlignment="ALIGN_CENTER"
+					verticalAlignment="ALIGN_MIDDLE">
+					<g:Label width="150px" height="150px" styleName="margined label_colored_red"
+						horizontalAlignment="ALIGN_CENTER">Drop Here!</g:Label>
+				</g:VerticalPanel>
 				<g:Button ui:field="passButton" styleName="margined">Pass this Round</g:Button>
-				<g:Label ui:field="drop_part" styleName="margined">Drop Me Here</g:Label>
-				<g:Label ui:field="drag_part" styleName="margined">Drag Me</g:Label>
+			</g:VerticalPanel>
+			<g:VerticalPanel styleName="margined">
+				<g:Label styleName="margined">Available Pieces</g:Label>
+				<g:FlowPanel ui:field="pieceSelectContainer" styleName="margined">
+				</g:FlowPanel>
 			</g:VerticalPanel>
 		</g:HorizontalPanel>
-		<g:Label styleName="margined">Available Pieces</g:Label>
-		<g:FlowPanel ui:field="pieceSelectContainer" styleName="margined">
-		</g:FlowPanel>
 	</g:VerticalPanel>
 </ui:UiBinder> 
