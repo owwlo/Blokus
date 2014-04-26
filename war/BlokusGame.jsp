@@ -2,6 +2,7 @@
 <htmtype filter textl>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="gwt:property" content="locale=<%= request.getLocale() %>">
 <meta name="viewport" content="width=device-width, initial-scale=0.7, user-scalable=0.7, minimum-scale=0.7, maximum-scale=0.7">
 <title>Blokus</title>
 <script type="text/javascript" language="javascript"
