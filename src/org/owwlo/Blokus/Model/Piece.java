@@ -77,6 +77,7 @@ public class Piece {
       addPoint(point);
     }
     this.pieceId = p.getId();
+    //this.rotate(p.getRotation());
   }
 
   /**
