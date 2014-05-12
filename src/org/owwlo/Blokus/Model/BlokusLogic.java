@@ -410,7 +410,7 @@ public class BlokusLogic {
 
     public static List<Operation> getMoveInitial(List<String> playerIds) {
         List<Operation> operations = Lists.newArrayList();
-        operations.add(new SetTurn(Ordering.<String> natural().max(playerIds)));
+        operations.add(new SetTurn(playerIds.get(1)));
         operations.add(new Set(Constants.JSON_USER_LIST, playerIds));
         operations.add(new Set(Constants.JSON_PASS_LIST, ImmutableList.<Integer> of()));
         operations.add(new Set(Constants.JSON_BITMAP, ""));

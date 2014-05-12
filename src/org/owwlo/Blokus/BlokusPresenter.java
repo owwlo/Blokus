@@ -48,6 +48,8 @@ public class BlokusPresenter {
         void cleanTryBlock();
 
         void updateMyStep(String player, Point pos, List<Point> pointList);
+
+        void debug(String str);
     }
 
     private final View view;
@@ -71,13 +73,21 @@ public class BlokusPresenter {
     public void updateUI(UpdateUI updateUI) {
         List<String> playerIds = updateUI.getPlayerIds();
         yourPlayerId = updateUI.getYourPlayerId();
+        int yourPlayerIndex = updateUI.getPlayerIndex(yourPlayerId);
 
         // At this time, the state is empty so the game just begins. Game
         // needs to be initialized.
-        if (updateUI.getState().isEmpty()
-                && yourPlayerId == Ordering.<String> natural().min(
-                        updateUI.getPlayerIds())) {
-            sendInitialMove(updateUI.getPlayerIds());
+//        if (updateUI.getState().isEmpty()
+//                && yourPlayerId == Ordering.<String> natural().min(
+//                        updateUI.getPlayerIds())) {
+//            sendInitialMove(updateUI.getPlayerIds());
+//            return;
+//        }
+
+        if (updateUI.getState().isEmpty()) {
+            if (yourPlayerIndex == 0) {
+                sendInitialMove(playerIds);
+            }
             return;
         }
 
@@ -127,7 +137,7 @@ public class BlokusPresenter {
                 currentState.getBitmapStr());
         if (isItMyTurn) {
             if (updateUI.isAiPlayer()) {
-                System.out.println("I am a AI lalala!");
+                //view.debug("ai");
                 MovablePiece p = ai.getPossibleMove(currentState, yourPlayerId);
                 disableUiAndWatch(yourPlayerId, currentState.getPieceFromPlayer());
                 if (p != null) {
@@ -136,12 +146,10 @@ public class BlokusPresenter {
                     passMyTurn();
                 }
             } else {
-                System.out.println("my Turn " + yourPlayerId);
                 showPickAndMakeMoveScene(yourPlayerId,
                         currentState.getPieceFromPlayer());
             }
         } else {
-            System.out.println("not my turn Disable Me" + yourPlayerId);
             disableUiAndWatch(yourPlayerId,
                     currentState.getPieceFromPlayer());
         }

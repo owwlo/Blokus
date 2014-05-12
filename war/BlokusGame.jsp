@@ -3,11 +3,39 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta name="gwt:property" content="locale=<%= request.getLocale() %>">
-<meta name="viewport" content="width=device-width, initial-scale=0.7, user-scalable=0.7, minimum-scale=0.7, maximum-scale=0.7">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=1, minimum-scale=1, maximum-scale=1">
 <title>Blokus</title>
 <script type="text/javascript" language="javascript"
 	src="org.BlokusGame/org.BlokusGame.nocache.js"></script>
+<script type="text/javascript" language="javascript">
+function scaleBody() {
+  var myGameWidth = 500;
+  var myGameHeight = 800;
+  var scaleX = window.innerWidth / myGameWidth;
+  var scaleY = window.innerHeight / myGameHeight;
+  var scale = Math.min(scaleX, scaleY);
+  var transformString = "scale(" + scale + "," + scale + ")";
+  document.body.style.transform = transformString;
+  document.body.style['-o-transform'] = transformString;
+  document.body.style['-webkit-transform'] = transformString;
+  document.body.style['-moz-transform'] = transformString;
+  document.body.style['-ms-transform'] = transformString;
+  var transformOriginString = "0 0 0";
+  document.body.style['transform-origin'] = transformOriginString;
+  document.body.style['-o-transform-origin'] = transformOriginString;
+  document.body.style['-webkit-transform-origin'] = transformOriginString;
+  document.body.style['-moz-transform-origin'] = transformOriginString;
+  document.body.style['-ms-transform-origin'] = transformOriginString;
+}
+window.onresize = scaleBody;
+window.onorientationchange = scaleBody;
+window.onload = scaleBody;
+document.addEventListener("orientationchange", scaleBody);
+</script>
 <style>
+html { overflow-x:hidden; 
+overflow-y:hidden;
+}
 .imgContainer {
 	overflow: hidden;
 	width: 73px;
@@ -48,7 +76,7 @@
   border-width:1px;
 }
 .maxWidthFixedDiv {
-  max-width:600px;
+  max-width:500px;
 }
 </style>
 </head>
