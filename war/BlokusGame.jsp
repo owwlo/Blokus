@@ -5,6 +5,7 @@
 <meta name="gwt:property" content="locale=<%= request.getLocale() %>">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=1, minimum-scale=1, maximum-scale=1">
 <title>Blokus</title>
+<script type="text/javascript" src="//multiplayer-gaming.com/api.js?version=1"></script>
 <script type="text/javascript" language="javascript"
 	src="org.BlokusGame/org.BlokusGame.nocache.js"></script>
 <script type="text/javascript" language="javascript">

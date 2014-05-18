@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.game_api.GameApi.ContainerConnector;
 import org.game_api.GameApi.Operation;
 import org.game_api.GameApi.Set;
 import org.game_api.GameApi.SetTurn;
 import org.game_api.GameApi.VerifyMove;
 import org.game_api.GameApi.VerifyMoveDone;
+import org.owwlo.Blokus.BlokusPresenter;
 import org.owwlo.Blokus.Constants;
 import org.owwlo.Blokus.Utils;
 
@@ -51,12 +53,14 @@ public class BlokusLogic {
             if (boardBitmap[point.x + p.x][point.y + p.y] != Constants.NO_OCCUPY_POINT_VALUE) {
                 return false;
             }
-            if (check4DirectionOccupy(point.x + p.x, point.y + p.y, Utils.getIntIdFromStringLongId(owner),
+            if (check4DirectionOccupy(point.x + p.x, point.y + p.y,
+                    Utils.getIntIdFromStringLongId(owner),
                     boardBitmap, xLen, yLen)) {
                 return false;
             }
             if (!isInitial) {
-                if (check4CornerOccupy(point.x + p.x, point.y + p.y, Utils.getIntIdFromStringLongId(owner),
+                if (check4CornerOccupy(point.x + p.x, point.y + p.y,
+                        Utils.getIntIdFromStringLongId(owner),
                         boardBitmap, xLen, yLen)) {
                     isCornerOccupy = true;
                 }
@@ -187,155 +191,157 @@ public class BlokusLogic {
 
     private static void checkMoveIsLegal(VerifyMove verifyMove)
             throws Exception {
-//        List<Operation> lastMove = verifyMove.getLastMove();
-//
-//        // Create a copy of the original Map for the type of the map is
-//        // Immutable.
-//        Map<String, Object> lastStateMap = new HashMap<>(
-//                verifyMove.getLastState());
-//        Map<String, Object> currentStateMap = verifyMove.getState();
-//        String lastPlayerId = verifyMove.getLastMovePlayerId();
-//        String otherPlayerId = null;
-//        for (String id : verifyMove.getPlayerIds()) {
-//            if (!id.equals(lastPlayerId)) {
-//                otherPlayerId = id;
-//                break;
-//            }
-//        }
-//
-//        // This is the initial move. No need to verify.
-//        if (lastStateMap.isEmpty() && currentStateMap.isEmpty()) {
-//            return;
-//        }
-//
-//        System.out.println("lastState:");
-//        System.out.println(lastStateMap);
-//        System.out.println("currentState:");
-//        System.out.println(currentStateMap);
-//
-//        System.out.println("lastPlayerId:" + lastPlayerId);
-//
-//        // The player in this side will make a move. Ignore verification.
-//        if (lastStateMap.isEmpty() && !currentStateMap.isEmpty()) {
-//            return;
-//        }
-//
-//        BlokusState lastState = getStateFromApiState(lastStateMap, lastPlayerId);
-//        BlokusState currentState = getStateFromApiState(currentStateMap, otherPlayerId);
-//        Map<String, Operation> operationSetMap = new HashMap<>();
-//
-//        boolean hasPassOperation = false;
-//
-//        // Pre-check operations
-//        for (Operation op : lastMove) {
-//            if (op instanceof Set) {
-//                String key = ((Set) op).getKey();
-//                if (key.equals(Constants.JSON_PASS)) {
-//                    hasPassOperation = true;
-//                }
-//                operationSetMap.put(key, op);
-//            }
-//        }
-//
-//        if (!hasPassOperation) {
-//            throw new Exception("Hacker! No valid operation");
-//        }
-//
-//        for (Operation op : lastMove) {
-//            if (op instanceof SetTurn) {
-//                lastStateMap.put(Constants.JSON_TURN, ((SetTurn) op).getPlayerId());
-//            } else if (op instanceof Set) {
-//                Set set = ((Set) op);
-//                String key = set.getKey();
-//                if (key.equals(Constants.JSON_TURN)) {
-//                    lastStateMap.put(Constants.JSON_TURN, (Integer) set.getValue());
-//                } else if (key.equals(Constants.JSON_PASS)) {
-//                    if (!(Boolean) set.getValue()) {
-//                        Set usePieceAction = (Set) operationSetMap
-//                                .get(Constants.JSON_USE_PIECE);
-//                        Set usePointAction = (Set) operationSetMap
-//                                .get(Constants.JSON_POINT);
-//
-//                        int pieceIndex = (Integer) usePieceAction.getValue();
-//                        String[] pointOrd = ((String) (usePointAction
-//                                .getValue())).split(",");
-//                        Point usePoint = new Point(
-//                                Integer.parseInt(pointOrd[1]),
-//                                Integer.parseInt(pointOrd[0]));
-//
-//                        MovablePiece mp = new MovablePiece(lastPlayerId,
-//                                Constants.BlokusPiece.pieceStringList
-//                                        .get(pieceIndex), usePoint);
-//
-//                        boolean isFit = BlokusLogic.canFit(
-//                                lastState,
-//                                mp,
-//                                checkInitialMoveForPlayer(lastPlayerId,
-//                                        lastState.getBitmap(),
-//                                        Constants.boardSizeMap.get(lastState
-//                                                .getPlayerList().size())));
-//                        if (isFit) {
-//                            // String appendedBmpStr =
-//                            // lastState.getBitmapString()
-//                            // + " " + Joiner.on(",").join(pointOrd) + "," +
-//                            // lastPlayerId;
-//                            //
-//                            // // Update Bitmap.
-//                            // lastStateMap.put(Constants.JSON_BITMAP,
-//                            // appendedBmpStr);
-//                            //
-//                            // // Update used piece list.
-//                            // Map<String, List<Integer>> usedPieces = new
-//                            // HashMap<>(
-//                            // lastState.getEveryPlayerUsedPiece());
-//                            // List<Integer> usedListForPlayer = new
-//                            // ArrayList<>(usedPieces.get(""
-//                            // + lastPlayerId));
-//                            //
-//                            // if (usedListForPlayer.contains(pieceIndex)) {
-//                            // throw new Exception("piece reused.");
-//                            // }
-//                            //
-//                            // usedListForPlayer.add(pieceIndex);
-//                            // usedPieces.put("" + lastPlayerId,
-//                            // usedListForPlayer);
-//                            // lastStateMap.put(Constants.JSON_USER_USED_PIECES,
-//                            // usedPieces);
-//                            //
-//                            // BlokusState newState =
-//                            // BlokusState.getStateFromApiState(lastStateMap,
-//                            // lastPlayerId);
-//                            // if (!BlokusState.equal(newState, currentState)) {
-//                            // throw new Exception("states not unified");
-//                            // }
-//                        } else {
-//                            throw new Exception("No fit");
-//                        }
-//                    } else {
-//                        List<String> passList = lastState.getPassList();
-//                        if (passList.contains(lastPlayerId)) {
-//                            /**
-//                             * TODO Finish the game.
-//                             */
-//                        } else {
-//                            lastState.addPassId(lastPlayerId);
-//                            lastStateMap.put(Constants.JSON_PASS_LIST, lastState.getPassList());
-//                            BlokusState newState = BlokusState.getStateFromApiState(lastStateMap,
-//                                    lastPlayerId);
-//                            if (!BlokusState.equal(newState, currentState)) {
-//                                throw new Exception("states not unified in pass");
-//                            }
-//                        }
-//                    }
-//                }
-//            } else if (op instanceof EndGame) {
-//                // TODO when will receive EndGame message??
-//            } else {
-//                // No other operation is needed. So, receiving other operation
-//                // means there being a hacker.
-//                throw new Exception("Hacker!");
-//            }
-//        }
+        // List<Operation> lastMove = verifyMove.getLastMove();
+        //
+        // // Create a copy of the original Map for the type of the map is
+        // // Immutable.
+        // Map<String, Object> lastStateMap = new HashMap<>(
+        // verifyMove.getLastState());
+        // Map<String, Object> currentStateMap = verifyMove.getState();
+        // String lastPlayerId = verifyMove.getLastMovePlayerId();
+        // String otherPlayerId = null;
+        // for (String id : verifyMove.getPlayerIds()) {
+        // if (!id.equals(lastPlayerId)) {
+        // otherPlayerId = id;
+        // break;
+        // }
+        // }
+        //
+        // // This is the initial move. No need to verify.
+        // if (lastStateMap.isEmpty() && currentStateMap.isEmpty()) {
+        // return;
+        // }
+        //
+        // System.out.println("lastState:");
+        // System.out.println(lastStateMap);
+        // System.out.println("currentState:");
+        // System.out.println(currentStateMap);
+        //
+        // System.out.println("lastPlayerId:" + lastPlayerId);
+        //
+        // // The player in this side will make a move. Ignore verification.
+        // if (lastStateMap.isEmpty() && !currentStateMap.isEmpty()) {
+        // return;
+        // }
+        //
+        // BlokusState lastState = getStateFromApiState(lastStateMap,
+        // lastPlayerId);
+        // BlokusState currentState = getStateFromApiState(currentStateMap,
+        // otherPlayerId);
+        // Map<String, Operation> operationSetMap = new HashMap<>();
+        //
+        // boolean hasPassOperation = false;
+        //
+        // // Pre-check operations
+        // for (Operation op : lastMove) {
+        // if (op instanceof Set) {
+        // String key = ((Set) op).getKey();
+        // if (key.equals(Constants.JSON_PASS)) {
+        // hasPassOperation = true;
+        // }
+        // operationSetMap.put(key, op);
+        // }
+        // }
+        //
+        // if (!hasPassOperation) {
+        // throw new Exception("Hacker! No valid operation");
+        // }
+        //
+        // for (Operation op : lastMove) {
+        // if (op instanceof SetTurn) {
+        // lastStateMap.put(Constants.JSON_TURN, ((SetTurn) op).getPlayerId());
+        // } else if (op instanceof Set) {
+        // Set set = ((Set) op);
+        // String key = set.getKey();
+        // if (key.equals(Constants.JSON_TURN)) {
+        // lastStateMap.put(Constants.JSON_TURN, (Integer) set.getValue());
+        // } else if (key.equals(Constants.JSON_PASS)) {
+        // if (!(Boolean) set.getValue()) {
+        // Set usePieceAction = (Set) operationSetMap
+        // .get(Constants.JSON_USE_PIECE);
+        // Set usePointAction = (Set) operationSetMap
+        // .get(Constants.JSON_POINT);
+        //
+        // int pieceIndex = (Integer) usePieceAction.getValue();
+        // String[] pointOrd = ((String) (usePointAction
+        // .getValue())).split(",");
+        // Point usePoint = new Point(
+        // Integer.parseInt(pointOrd[1]),
+        // Integer.parseInt(pointOrd[0]));
+        //
+        // MovablePiece mp = new MovablePiece(lastPlayerId,
+        // Constants.BlokusPiece.pieceStringList
+        // .get(pieceIndex), usePoint);
+        //
+        // boolean isFit = BlokusLogic.canFit(
+        // lastState,
+        // mp,
+        // checkInitialMoveForPlayer(lastPlayerId,
+        // lastState.getBitmap(),
+        // Constants.boardSizeMap.get(lastState
+        // .getPlayerList().size())));
+        // if (isFit) {
+        // // String appendedBmpStr =
+        // // lastState.getBitmapString()
+        // // + " " + Joiner.on(",").join(pointOrd) + "," +
+        // // lastPlayerId;
+        // //
+        // // // Update Bitmap.
+        // // lastStateMap.put(Constants.JSON_BITMAP,
+        // // appendedBmpStr);
+        // //
+        // // // Update used piece list.
+        // // Map<String, List<Integer>> usedPieces = new
+        // // HashMap<>(
+        // // lastState.getEveryPlayerUsedPiece());
+        // // List<Integer> usedListForPlayer = new
+        // // ArrayList<>(usedPieces.get(""
+        // // + lastPlayerId));
+        // //
+        // // if (usedListForPlayer.contains(pieceIndex)) {
+        // // throw new Exception("piece reused.");
+        // // }
+        // //
+        // // usedListForPlayer.add(pieceIndex);
+        // // usedPieces.put("" + lastPlayerId,
+        // // usedListForPlayer);
+        // // lastStateMap.put(Constants.JSON_USER_USED_PIECES,
+        // // usedPieces);
+        // //
+        // // BlokusState newState =
+        // // BlokusState.getStateFromApiState(lastStateMap,
+        // // lastPlayerId);
+        // // if (!BlokusState.equal(newState, currentState)) {
+        // // throw new Exception("states not unified");
+        // // }
+        // } else {
+        // throw new Exception("No fit");
+        // }
+        // } else {
+        // List<String> passList = lastState.getPassList();
+        // if (passList.contains(lastPlayerId)) {
+        // /**
+        // * TODO Finish the game.
+        // */
+        // } else {
+        // lastState.addPassId(lastPlayerId);
+        // lastStateMap.put(Constants.JSON_PASS_LIST, lastState.getPassList());
+        // BlokusState newState = BlokusState.getStateFromApiState(lastStateMap,
+        // lastPlayerId);
+        // if (!BlokusState.equal(newState, currentState)) {
+        // throw new Exception("states not unified in pass");
+        // }
+        // }
+        // }
+        // }
+        // } else if (op instanceof EndGame) {
+        // // TODO when will receive EndGame message??
+        // } else {
+        // // No other operation is needed. So, receiving other operation
+        // // means there being a hacker.
+        // throw new Exception("Hacker!");
+        // }
+        // }
     }
 
     private static BlokusState getStateFromApiState(
@@ -345,7 +351,7 @@ public class BlokusLogic {
 
     public static boolean checkInitialMoveForPlayer(String playerId,
             int[][] boardBitmap, int len) {
-      int playerIdInt = Utils.getIntIdFromStringLongId(playerId);
+        int playerIdInt = Utils.getIntIdFromStringLongId(playerId);
         for (int i = 0; i < len; i++) {
             for (int j = 0; j < len; j++) {
                 if (boardBitmap[i][j] == playerIdInt) {
@@ -398,6 +404,8 @@ public class BlokusLogic {
                 .getEveryPlayerUsedPiece());
         newUsedMap.put("" + currentState.getTurn(), newUsedList);
 
+        BlokusPresenter.console("currentState.getOppositeId() " + currentState.getOppositeId());
+        
         List<Operation> ops = ImmutableList.<Operation> of(new SetTurn(
                 currentState.getOppositeId()), new Set(Constants.JSON_PASS, false),
                 new Set(Constants.JSON_ROTATION, rotation),

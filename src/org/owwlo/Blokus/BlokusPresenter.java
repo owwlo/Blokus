@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.game_api.GameApi.Container;
+import org.game_api.GameApi.Operation;
+import org.game_api.GameApi.SetTurn;
 import org.game_api.GameApi.UpdateUI;
 import org.owwlo.Blokus.Model.BlokusLogic;
 import org.owwlo.Blokus.Model.BlokusLogic.MovablePiece;
@@ -13,9 +15,9 @@ import org.owwlo.Blokus.Model.Piece;
 import org.owwlo.Blokus.Model.Point;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 
 public class BlokusPresenter {
+
     public enum ViewState {
         VIEW_ONLY, MAKE_MOVE
     }
@@ -77,27 +79,37 @@ public class BlokusPresenter {
 
         // At this time, the state is empty so the game just begins. Game
         // needs to be initialized.
-//        if (updateUI.getState().isEmpty()
-//                && yourPlayerId == Ordering.<String> natural().min(
-//                        updateUI.getPlayerIds())) {
-//            sendInitialMove(updateUI.getPlayerIds());
-//            return;
-//        }
+        // if (updateUI.getState().isEmpty()
+        // && yourPlayerId == Ordering.<String> natural().min(
+        // updateUI.getPlayerIds())) {
+        // sendInitialMove(updateUI.getPlayerIds());
+        // return;
+        // }
 
         if (updateUI.getState().isEmpty()) {
             if (yourPlayerIndex == 0) {
+                console("sendInitialMove");
                 sendInitialMove(playerIds);
             }
             return;
         }
 
-        String currentPlayerId = updateUI.getPlayerIds().get(
-                (updateUI.getPlayerIds()
-                        .indexOf(updateUI.getLastMovePlayerId()) + 1)
-                        % updateUI.getPlayerIds().size());
+        console("updateUI.getPlayerIds() " + updateUI.getPlayerIds());
+        
+        String currentPlayerId = "";
+        for (Operation operation : updateUI.getLastMove()) {
+            if (operation instanceof SetTurn) {
+                currentPlayerId = ((SetTurn) operation).getPlayerId();
+            }
+          }
+        
+//        String currentPlayerId = updateUI.getPlayerIds().get(
+//                (updateUI.getPlayerIds()
+//                        .indexOf(updateUI.getLastMovePlayerId()) + 1)
+//                        % updateUI.getPlayerIds().size());
         currentState = BlokusState.getStateFromApiState(updateUI.getState(),
                 currentPlayerId);
-
+        
         // If there is no player id in player list, the player is a viewer.
         if (!updateUI.getPlayerIds().contains(yourPlayerId)) {
             disableUiAndWatch(yourPlayerId, currentState.getPieceFromPlayer());
@@ -130,14 +142,19 @@ public class BlokusPresenter {
             return;
         }
 
-        boolean isItMyTurn = (yourPlayerId == currentState.getTurn());
+        boolean isItMyTurn = (yourPlayerId == currentPlayerId);
 
+        console("isItMyTurn " + isItMyTurn);
+        console("yourPlayerId " + yourPlayerId);
+        console("currentState.getTurn() " + currentState.getTurn());
+        console("currentPlayerId " + currentPlayerId);
+        
         // No matter whose turn, Update the game board.
         updateGameBoard(yourPlayerId, currentState.getPlayerList(),
                 currentState.getBitmapStr());
         if (isItMyTurn) {
             if (updateUI.isAiPlayer()) {
-                //view.debug("ai");
+                // view.debug("ai");
                 MovablePiece p = ai.getPossibleMove(currentState, yourPlayerId);
                 disableUiAndWatch(yourPlayerId, currentState.getPieceFromPlayer());
                 if (p != null) {
@@ -214,14 +231,14 @@ public class BlokusPresenter {
         if (canFit) {
             view.setViewState(ViewState.VIEW_ONLY);
 
-            container.sendMakeMove(BlokusLogic.getMakeMoveOperations(
-                    currentState, piece.getId(), piece.getRotation(), pos));
-
             /**
              * Do I really need to do this? Won't container send the updated
              * state back to me?
              */
             updateView(yourPlayerId, piece.getId(), piece.getRotation(), pos);
+            
+            container.sendMakeMove(BlokusLogic.getMakeMoveOperations(
+                    currentState, piece.getId(), piece.getRotation(), pos));
         }
     }
 
@@ -240,4 +257,8 @@ public class BlokusPresenter {
             chosePiece.rotate();
         }
     }
+
+    public static native void console(String str) /*-{
+        console.log(str);
+    }-*/;
 }
